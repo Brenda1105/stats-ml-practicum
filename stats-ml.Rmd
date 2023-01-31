@@ -64,7 +64,15 @@ predict(m, data.frame(distance = 0.5), se = TRUE, type = "response")
 Questions and tasks:
 
 - Comment on the fit, plot residuals and comment on them.
+```{r}
+summary(m)
+plot(resid(m))
+```
+As for model, we see that Residual deviance is 332.0 and Residual degree is 2998. The ratio of them is lower than 1 which is underdisperse.
+The residuals distribute evenly around 0. So, the prediction of this model is good.
+
 - Comment on the prediction; does it seem reasonable?
+Yes. We see that se.fit is 0.005392449 which is small. So, it is reasonable.
 
 
 ## ML 1: LOESS
@@ -79,9 +87,18 @@ predict(m, data.frame(distance = 0.5), se = TRUE)
 Questions and tasks:
 
 - Check the definition of the `loess` function; how does it differ from the previous approach?
-- Comment on the fit; does it seem reasonable?
-- Comment on the prediction, including the SE.
+Quasibinomial regression is a parametric regression method. However, LOESS is a non-parametric regression.
+LOESS is used to smooth scatterplot data, while Quasibinomial regression is used to model count data with overdispersion.
 
+- Comment on the fit; does it seem reasonable?
+```{r}
+rsq <- 1 - sum((canopy$cover - fitted(m))^2) / sum((canopy$cover - mean(canopy$cover))^2)
+rsq
+```
+We can see the rsq of this model >0.9. So, it has high interpretability.
+
+- Comment on the prediction, including the SE.
+we find that se.fit is 0.004378154 and residual.scale is 0.1229851, both of them are small. So, this prediction of this model is good.
 
 ## ML 2: Random Forest
 
@@ -96,9 +113,18 @@ predict(m, data.frame(distance = 0.5), se = TRUE)
 Questions and tasks:
 
 - Check what `randomForest` does; what is **keyword** here?
-- Comment on the fit; how does it differ from the previous fits?
-- Comment on the prediction; how would you obtain a measure of uncertainty?
+Random Forest is an ensemble learning method for classification and regression that constructs a multitude of decision trees at training time and outputs the class that is the mode of the classes (classification) or mean prediction (regression) of the individual trees.
 
+The keyword at here is random Forest.
+
+- Comment on the fit; how does it differ from the previous fits?
+
+
+LOESS (Locally Weighted Scatterplot Smoothing) is a non-parametric regression method used for smoothing and modeling data. And random forest is predict the situation of data.
+
+- Comment on the prediction; how would you obtain a measure of uncertainty?
+The prediction of this model is 0.536971 which is close to actual data. So, it is not bad.
+see the confidence of intervals or it is also possible for us to use cross validation or bootstrap to obtain a measure of uncertainty.
 
 ## Statistics 2: Cubic Fit
 
@@ -112,9 +138,14 @@ predict(m, data.frame(distance = 0.5), se = TRUE, type = "response")
 Questions and tasks:
 
 - Comment on the fit and compare it to the first model; plot and check residuals.
-- Comment on the prediction and compare it to previous results.
-- How would you know that a cubic fit is good enough?
 
+- Comment on the prediction and compare it to previous results.
+
+- How would you know that a cubic fit is good enough?
+Coefficient of determination (R^2) - the closer R^2 is to 1, the better the fit
+Root Mean Squared Error (RMSE) - the lower the RMSE, the better the fit
+Visual inspection of the residuals plot - random patterns indicate a good fit
+Comparison with other models - if a cubic fit outperforms simpler models, it is likely to be good enough.
 
 ## Discussion
 
@@ -122,6 +153,12 @@ Let's try to connect all lessons learned from your work and the discussions.
 Elaborate more on the following questions:
 
 - How would you know that the predictions are *reliable*?
+Before we predict, we can see whether our built model is reasonable. 
+Or we can see the accuracy of predicted data to see whether predictions are reliable.
+
 - How would you test that the cover is exactly 50% at the boundary (`distance` = 0.5)? Which approaches would make the test easier to perform?
+1. Use a large sample size to detect; 2. Use a confidence interval with distance = .5 to detect;3. Plot a histogram of the cover proportions.
+
 - How would you incorporate `location` in your analyses? How would you know that
 it is meaningful to use it?
+make it as a predictor and fit the model. See the summary of fitted model.
